@@ -1,0 +1,273 @@
+#include<bits/stdc++.h>
+#include<GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+
+using namespace std;
+
+double Txval=-1.5,Tyval=0,Tzval=-1.5;
+double windowHeight=700, windowWidth=900;
+double Eyex=-4, Eyey=5, Eyez=10;
+double lookatx=0, lookaty=0, lookatz=0;
+double headx=0, heady=1, headz=0;
+
+
+GLfloat alpha = 0.0, theta = 0.0, gama=0.0, axis_x=0.0, axis_y=0.0, axis_z=0;
+GLboolean xRotate = false, yRotate = false, zRotate = false;
+
+
+static GLfloat v_pyramid[5][3] =
+{
+    {0.0, 0.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {1.0, 0.0, 1.0},
+    {1.0, 0.0, 0.0},
+    {0.5, 0.5, 0.5}
+};
+static GLfloat v_cube[8][3]=
+{
+    {0.0, 0.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {1.0, 0.0, 1.0},
+    {1.0, 0.0, 0.0},
+
+    {0.0, 1.0, 0.0},
+    {0.0, 1.0, 1.0},
+    {1.0, 1.0, 1.0},
+    {1.0, 1.0, 0.0}
+
+};
+
+static GLubyte p_Indices[4][3] =
+{
+    {4, 1, 2},
+    {4, 2, 3},
+    {4, 3, 0},
+    {4, 0, 1}
+};
+
+
+static GLubyte quadIndices[1][4] =
+{
+    {0, 3, 2, 1}
+};
+
+static GLbyte q_Indices[6][4]=
+{
+    {0, 1, 2, 3},
+    {4, 5, 6, 7},
+    {1, 2, 6, 5},
+    {2, 3, 7, 6},
+    {0, 3, 7, 4},
+    {0, 1, 5, 4}
+};
+
+static GLfloat colors[6][3] =
+{
+    {0.0, 0.0, 1.0},
+    {0.5, 0.0, 1.0},
+    {0.0, 1.0, 0.0},
+    {0.0, 1.0, 1.0},
+    {0.5, 0.5, 0.0},
+    {.2, 0.6, 0.6}
+};
+
+void drawpyramid()
+{
+    glColor3f(1,0,0);
+    glBegin(GL_TRIANGLES);
+    for (GLint i = 0; i <4; i++)
+    {
+        glColor3f(colors[i][0],colors[i][1],colors[i][2]);
+        glVertex3fv(&v_pyramid[p_Indices[i][0]][0]);
+        glVertex3fv(&v_pyramid[p_Indices[i][1]][0]);
+        glVertex3fv(&v_pyramid[p_Indices[i][2]][0]);
+    }
+    glEnd();
+
+    glBegin(GL_QUADS);
+    for (GLint i = 0; i <1; i++)
+    {
+        glColor3f(colors[4][0],colors[4][1],colors[4][2]);
+        glVertex3fv(&v_pyramid[quadIndices[i][0]][0]);
+        glVertex3fv(&v_pyramid[quadIndices[i][1]][0]);
+        glVertex3fv(&v_pyramid[quadIndices[i][2]][0]);
+        glVertex3fv(&v_pyramid[quadIndices[i][3]][0]);
+    }
+    glEnd();
+
+
+}
+void drawcube()
+{
+    glColor3f(1,0,0);
+    glBegin(GL_QUADS);
+    for (GLint i = 0; i <6; i++)
+    {
+        glColor3f(colors[i][0],colors[i][1],colors[i][2]);
+        glVertex3fv(&v_cube[q_Indices[i][0]][0]);
+        glVertex3fv(&v_cube[q_Indices[i][1]][0]);
+        glVertex3fv(&v_cube[q_Indices[i][2]][0]);
+        glVertex3fv(&v_cube[q_Indices[i][3]][0]);
+    }
+    glEnd();
+}
+
+void axis()
+{
+    glBegin(GL_LINES);
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(15,0.0,0);
+    glVertex3f(-15,0.0,0);
+
+    glColor3f(0,1,0.0);
+    glVertex3f(0,15,0);
+    glVertex3f(0,-15,0);
+
+    //z axis
+    glColor3f(0,0,1);
+    glVertex3f(0,0,15);
+    glVertex3f(0,0,-15);
+
+    glEnd();
+}
+
+
+
+
+void display(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glFrustum(-5, 5, -5, 5, 5, 50);
+    //gluPerspective(60,1,5,100);
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+    gluLookAt(Eyex,Eyey,Eyez, lookatx,lookaty, lookatz, headx, heady, headz);
+    glViewport(0, 0, windowWidth, windowHeight);
+
+
+    axis();
+
+    glPushMatrix();
+    glRotatef( alpha,axis_x, axis_y, axis_z );
+    glRotatef( theta, axis_x, axis_y, axis_z );
+    glRotatef(gama, axis_x, axis_y, axis_z);
+
+    // Kuett start here
+    glPushMatrix();
+    glTranslatef(2,2.5,0);
+    glScalef(1,5,1);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(2.5,2.5,0);
+    glRotatef(-35,0,0,1);
+    glTranslatef(0,1.25,0);
+    glScalef(1,2.5,1);
+    glutSolidCube(1);
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glTranslatef(2.5,2.5,0);
+    glRotatef(35,0,0,1);
+    glTranslatef(0,-1.25,0);
+    glScalef(1,2.5,1);
+    glutSolidCube(1);
+    glPopMatrix();
+
+
+
+    // kuet end here
+    glPopMatrix();
+
+
+
+    glFlush();
+    glutSwapBuffers();
+
+}
+
+
+
+
+void myKeyboardFunc( unsigned char key, int x, int y )
+{
+    switch ( key )
+    {
+    case 'y':
+    case 'Y':
+        yRotate = !yRotate;
+        xRotate = false;
+        zRotate = false;
+        axis_x=0.0;
+        axis_y=1.0;
+        axis_z=0;
+        break;
+
+    }
+    glutPostRedisplay();
+}
+
+void Specialkey(int key, int x, int y)
+{
+    switch(key)
+    {
+    case GLUT_KEY_UP:
+        Eyez-=1;
+        lookatz-=1;
+        break;
+    case GLUT_KEY_DOWN:
+        Eyez+=1;
+        lookatz+=1;
+        break;
+    case GLUT_KEY_LEFT:
+        Eyex-=1;
+        lookatx-=1;
+        break;
+    case GLUT_KEY_RIGHT:
+        Eyex+=1;
+        lookatx+=1;
+        break;
+    }
+
+    glutPostRedisplay();
+}
+
+
+
+void animate()
+{
+    if (yRotate == true)
+    {
+        alpha += 0.1;
+        if(alpha > 360.0)
+            alpha -= 360.0*floor(alpha/360.0);
+    }
+
+    glutPostRedisplay();
+}
+
+int main (int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowPosition(600,50);
+    glutInitWindowSize(windowWidth, windowHeight);
+    glutCreateWindow("MyHome-Demo");
+    glShadeModel( GL_SMOOTH );
+    glEnable( GL_DEPTH_TEST );
+    glutKeyboardFunc(myKeyboardFunc);
+    glutSpecialFunc(Specialkey);
+    glutDisplayFunc(display);
+
+    glutIdleFunc(animate);
+
+    glutMainLoop();
+
+    return 0;
+}
+
